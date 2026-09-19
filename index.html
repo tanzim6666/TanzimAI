@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ec4899">
+    <title>Tanzim AI - Tomar Girlfriend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background: linear-gradient(135deg, #1a0a1e 0%, #0d1b2a 50%, #1b0a2e 100%);
+            min-height: 100vh; color: #e0e0e0; overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(236, 72, 153, 0.4); border-radius: 10px; }
+        .bg-animated {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(135deg, #1a0a1e, #0d1b2a, #1b0a2e, #2d1b3d);
+            background-size: 400% 400%; animation: gradientShift 15s ease infinite;
+        }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-pink { background: rgba(236, 72, 153, 0.08); backdrop-filter: blur(20px); border: 1px solid rgba(236, 72, 153, 0.15); }
+        .page { transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); min-height: 100vh; }
+        .page.hidden { opacity: 0; transform: scale(0.95); pointer-events: none; position: absolute; width: 100%; }
+        .page.visible { opacity: 1; transform: scale(1); }
+        .floating-heart { position: absolute; animation: floatHeart 8s ease-in-out infinite; opacity: 0.12; pointer-events: none; }
+        @keyframes floatHeart { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-25px) rotate(10deg); } }
+        .pulse-ring { animation: pulseRing 2.5s infinite; }
+        @keyframes pulseRing { 0% { transform: scale(0.9); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 0.3; } 100% { transform: scale(0.9); opacity: 0.8; } }
+        .btn-glow { position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(236, 72, 153, 0.4); }
+        .typing-dot { animation: typingBounce 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+        @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+        .msg-ai { background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(236, 72, 153, 0.2); border-radius: 18px 18px 18px 4px; animation: msgSlide 0.3s ease-out; }
+        .msg-user { background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.25)); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 18px 18px 4px 18px; animation: msgSlide 0.3s ease-out; }
+        @keyframes msgSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .mood-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 12px; display: inline-flex; margin-top: 4px; }
+        .mood-angry { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .mood-sad { background: rgba(59,130,246,0.2); color: #93c5fd; }
+        .mood-love { background: rgba(236,72,153,0.2); color: #f9a8d4; }
+        .mood-question { background: rgba(245,158,11,0.2); color: #fcd34d; }
+        .mood-happy { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+        .mood-normal { background: rgba(139,92,246,0.2); color: #c4b5fd; }
+        .avatar-large { 
+            width: 140px; height: 140px; border-radius: 50%; object-fit: cover; 
+            border: 3px solid rgba(236,72,153,0.8);
+            box-shadow: 0 0 40px rgba(236,72,153,0.4);
+            image-rendering: -webkit-optimize-contrast;
+            animation: avatarPulse 3s infinite alternate; 
+        }
+        @keyframes avatarPulse { from { box-shadow: 0 0 30px rgba(236,72,153,0.3); } to { box-shadow: 0 0 60px rgba(236,72,153,0.5); } }
+        .avatar-small { 
+            width: 42px; height: 42px; border-radius: 50%; object-fit: cover; 
+            border: 2px solid rgba(236,72,153,0.8);
+            image-rendering: -webkit-optimize-contrast;
+        }
+        .avatar-tiny {
+            width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+            border: 1.5px solid rgba(236,72,153,0.6);
+            image-rendering: -webkit-optimize-contrast;
+        }
+        .online-dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; border: 2px solid #1a0a1e; animation: onlinePulse 2s infinite; }
+        @keyframes onlinePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); } }
+        .chat-container { height: calc(100vh - 140px); overflow-y: auto; scroll-behavior: smooth; padding: 16px; }
+        .chat-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 12px 20px; color: #e0e0e0; font-size: 15px; outline: none; transition: all 0.3s; }
+        .chat-input:focus { border-color: rgba(236,72,153,0.5); box-shadow: 0 0 20px rgba(236,72,153,0.15); }
+        .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+        .send-btn { background: linear-gradient(135deg, #ec4899, #a855f7); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
+        .send-btn:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(236,72,153,0.5); }
+        .name-input { background: rgba(255,255,255,0.05); border: 2px solid rgba(236,72,153,0.3); border-radius: 16px; padding: 16px 24px; color: #e0e0e0; font-size: 1.1rem; text-align: center; outline: none; width: 100%; transition: all 0.3s; }
+        .name-input:focus { border-color: rgba(236,72,153,0.6); box-shadow: 0 0 30px rgba(236,72,153,0.2); }
+        .name-input::placeholder { color: rgba(255,255,255,0.3); }
+        .glow-text { text-shadow: 0 0 20px rgba(236,72,153,0.5); }
+        .status-bar { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ec4899, #a855f7, #ec4899); background-size: 200% 100%; animation: statusFlow 3s linear infinite; z-index: 9999; }
+        @keyframes statusFlow { 0% { background-position: 0%; } 100% { background-position: 200%; } }
+        .msg-time { font-size: 0.6rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+        .read-receipt { color: #60a5fa; font-size: 0.7rem; }
+        .msg-image { max-width: 200px; border-radius: 12px; margin-top: 4px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #ec4899, #a855f7); color: white; padding: 12px 24px; border-radius: 12px; z-index: 9999; transition: transform 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .menu-dropdown { position: absolute; top: 60px; right: 16px; background: rgba(20,20,30,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px; min-width: 180px; display: none; z-index: 100; }
+        .menu-dropdown.show { display: block; animation: slideDown 0.2s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .menu-item { padding: 10px 16px; border-radius: 8px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        .menu-item:hover { background: rgba(236,72,153,0.2); }
+    </style>
+</head>
+<body>
+    <div class="status-bar"></div>
+    <div class="bg-animated"></div>
+    <div id="toast" class="toast"></div>
+
+    <!-- PAGE 1: HOME -->
+    <div id="homePage" class="page visible min-h-screen flex flex-col items-center justify-center px-4">
+        <div class="floating-heart text-7xl" style="top:8%;left:8%;animation-delay:0s">💖</div>
+        <div class="floating-heart text-5xl" style="top:15%;right:12%;animation-delay:1.5s">💕</div>
+        <div class="floating-heart text-6xl" style="bottom:18%;left:15%;animation-delay:3s">💗</div>
+        <div class="floating-heart text-4xl" style="bottom:25%;right:8%;animation-delay:4.5s">✨</div>
+
+        <div class="text-center z-10 max-w-2xl w-full">
+            <div class="mb-8 relative inline-block">
+                <div class="absolute inset-0 bg-pink-500 rounded-full blur-3xl opacity-30 pulse-ring"></div>
+                <img src="logo.png" class="avatar-large relative z-10" alt="Tanzim AI Logo">
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-3 glow-text bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Tanzim AI</h1>
+            <p class="text-lg text-pink-300/80 mb-2">Tomar Romantic Girlfriend</p>
+            <div class="glass-pink rounded-2xl px-6 py-3 mb-8 inline-block">
+                <p class="text-sm text-pink-200">💕 Sudhu single cheleder jonno 💕</p>
+            </div>
+            <p class="text-base text-gray-400 mb-10 max-w-md mx-auto">Banglish e kotha bolbe, jan-babi-babu dakbe, WhatsApp er moto sound!</p>
+            <button id="letsTalkBtn" class="btn-glow bg-gradient-to-r from-pink-500 to-purple-600 text-white px-14 py-5 rounded-full font-bold text-xl shadow-2xl shadow-pink-500/30 flex items-center gap-3 mx-auto">
+                💬 Kotha Bolo →
+            </button>
+            <div class="grid grid-cols-3 gap-4 mt-14">
+                <div class="glass rounded-2xl p-4">
+                    <div class="text-3xl mb-2">💬</div>
+                    <h3 class="font-bold text-pink-300 text-sm">Banglish</h3>
+                    <p class="text-xs text-gray-500 mt-1">Ekdum real</p>
+                </div>
+                <div class="glass rounded-2xl p-4">
+                    <div class="text-3xl mb-2">🎭</div>
+                    <h3 class="font-bold text-pink-300 text-sm">8 Moods</h3>
+                    <p class="text-xs text-gray-500 mt-1">Rag khushi shob</p>
+                </div>
+                <div class="glass rounded-2xl p-4">
+                    <div class="text-3xl mb-2">💝</div>
+                    <h3 class="font-bold text-pink-300 text-sm">100% Free</h3>
+                    <p class="text-xs text-gray-500 mt-1">Kono limit nai</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: SELECT -->
+    <div id="selectPage" class="page hidden min-h-screen flex flex-col items-center justify-center px-4">
+        <div class="floating-heart text-6xl" style="top:10%;left:10%">💖</div>
+        <div class="floating-heart text-5xl" style="top:20%;right:15%;animation-delay:1s">💕</div>
+        <div class="floating-heart text-6xl" style="bottom:20%;left:20%;animation-delay:2s">💗</div>
+
+        <div class="text-center z-10 max-w-md w-full">
+            <button id="backToHomeBtn" class="absolute top-6 left-6 text-pink-400 hover:text-pink-300 transition">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </button>
+
+            <div class="mb-8 relative inline-block">
+                <div class="absolute inset-0 bg-pink-500 rounded-full blur-3xl opacity-30 pulse-ring"></div>
+                <img src="girl.png" class="avatar-large relative z-10" alt="Your Girlfriend">
+                <div class="absolute bottom-2 right-2 z-20"><div class="online-dot"></div></div>
+            </div>
+
+            <h2 class="text-3xl md:text-4xl font-bold mb-3 glow-text bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Tomar Girlfriend</h2>
+            <p class="text-base text-gray-400 mb-8">Nam dao, she tomake dakbe 💕</p>
+
+            <div class="glass rounded-3xl p-8 shadow-2xl">
+                <input type="text" id="girlfriendName" placeholder="Meyer nam lekho..." class="name-input mb-4" maxlength="20">
+                <button id="startChatBtn" class="btn-glow w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl">
+                    💝 Chat Shuru Koro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: CHAT -->
+    <div id="chatPage" class="page hidden min-h-screen flex flex-col">
+        <header class="glass sticky top-0 z-50 px-4 py-3 border-b border-white/5">
+            <div class="max-w-3xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button id="backToSelectBtn" class="text-pink-400 hover:text-pink-300 transition p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    </button>
+                    <div class="relative">
+                        <img src="girl.png" class="avatar-small" alt="Avatar">
+                        <div class="absolute bottom-0 right-0"><div class="online-dot" style="width:8px;height:8px"></div></div>
+                    </div>
+                    <div>
+                        <h1 id="chatTitle" class="text-lg font-bold glow-text text-pink-300">Tanzim AI</h1>
+                        <p id="chatStatus" class="text-xs text-green-400 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> <span id="statusText">online</span>
+                        </p>
+                    </div>
+                </div>
+                <button id="menuBtn" class="text-pink-400 hover:text-pink-300 transition p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+                </button>
+            </div>
+            
+            <div id="menuDropdown" class="menu-dropdown">
+                <div class="menu-item" id="exportChatBtn">📥 <span>Chat download</span></div>
+                <div class="menu-item" id="clearChatBtn">🗑️ <span>Chat clear koro</span></div>
+                <div class="menu-item" id="soundToggleBtn">🔊 <span>Sound: ON</span></div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-3xl mx-auto w-full">
+            <div id="chatArea" class="chat-container"></div>
+        </main>
+
+        <div class="glass border-t border-white/5 p-3">
+            <div class="max-w-3xl mx-auto flex items-center gap-2">
+                <label for="imageInput" class="text-pink-400 hover:text-pink-300 transition p-2 cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </label>
+                <input type="file" id="imageInput" accept="image/*" class="hidden">
+                <input type="text" id="userInput" placeholder="Message lekho..." class="chat-input flex-1" autocomplete="off">
+                <button id="sendBtn" class="send-btn">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const homePage = document.getElementById('homePage');
+    const selectPage = document.getElementById('selectPage');
+    const chatPage = document.getElementById('chatPage');
+    const letsTalkBtn = document.getElementById('letsTalkBtn');
+    const backToHomeBtn = document.getElementById('backToHomeBtn');
+    const startChatBtn = document.getElementById('startChatBtn');
+    const backToSelectBtn = document.getElementById('backToSelectBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const girlfriendNameInput = document.getElementById('girlfriendName');
+    const userInput = document.getElementById('userInput');
+    const chatArea = document.getElementById('chatArea');
+    const chatTitle = document.getElementById('chatTitle');
+    const statusText = document.getElementById('statusText');
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    const exportChatBtn = document.getElementById('exportChatBtn');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const imageInput = document.getElementById('imageInput');
+    const toast = document.getElementById('toast');
+
+    let chatStarted = false;
+    let soundEnabled = true;
+    const girlAvatar = 'girl.png';
+    let chatHistory = [];
+
+    // ========== WHATSAPP-LIKE SOUND ==========
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function initAudio() {
+        if (!audioCtx) {
+            try { audioCtx = new AudioContext(); } catch(e) {}
+        }
+    }
+
+    function playReceiveSound() {
+        if (!soundEnabled) return;
+        initAudio();
+        if (!audioCtx) return;
+        try {
+            const now = audioCtx.currentTime;
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.frequency.setValueAtTime(880, now);
+            osc1.type = 'sine';
+            gain1.gain.setValueAtTime(0.15, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc1.start(now);
+            osc1.stop(now + 0.15);
+            
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.frequency.setValueAtTime(660, now + 0.1);
+            osc2.type = 'sine';
+            gain2.gain.setValueAtTime(0.12, now + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc2.start(now + 0.1);
+            osc2.stop(now + 0.25);
+        } catch(e) {}
+    }
+
+    function playSendSound() {
+        if (!soundEnabled) return;
+        initAudio();
+        if (!audioCtx) return;
+        try {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } catch(e) {}
+    }
+
+    function vibrate(pattern = [50, 30, 50]) {
+        if ('vibrate' in navigator) {
+            try { navigator.vibrate(pattern); } catch(e) {}
+        }
+    }
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function getTimeGreeting() {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) return { text: 'shubho shokal', emoji: '🌅' };
+        if (hour >= 12 && hour < 17) return { text: 'shubho dupur', emoji: '☀️' };
+        if (hour >= 17 && hour < 20) return { text: 'shubho shondha', emoji: '🌆' };
+        return { text: 'shubho ratri', emoji: '🌙' };
+    }
+
+    function saveChat() {
+        try {
+            localStorage.setItem('tanzim_chat_v3', JSON.stringify(chatHistory));
+            localStorage.setItem('tanzim_name_v3', chatTitle.textContent.replace(' 💕', ''));
+        } catch(e) {}
+    }
+
+    function loadChat() {
+        try {
+            const saved = localStorage.getItem('tanzim_chat_v3');
+            const savedName = localStorage.getItem('tanzim_name_v3');
+            if (savedName) girlfriendNameInput.value = savedName;
+            if (saved) { chatHistory = JSON.parse(saved); return true; }
+        } catch(e) {}
+        return false;
+    }
+
+    function showPage(show, hide) {
+        hide.classList.add('hidden');
+        hide.classList.remove('visible');
+        setTimeout(() => { show.classList.remove('hidden'); show.classList.add('visible'); }, 300);
+    }
+
+    letsTalkBtn.addEventListener('click', () => { playSendSound(); showPage(selectPage, homePage); });
+    backToHomeBtn.addEventListener('click', () => showPage(homePage, selectPage));
+
+    startChatBtn.addEventListener('click', () => {
+        const name = girlfriendNameInput.value.trim();
+        if (!name) {
+            girlfriendNameInput.style.borderColor = '#ef4444';
+            girlfriendNameInput.placeholder = '⚠️ Nam dao age!';
+            vibrate([100, 50, 100]);
+            setTimeout(() => { 
+                girlfriendNameInput.style.borderColor = 'rgba(236,72,153,0.3)'; 
+                girlfriendNameInput.placeholder = 'Meyer nam lekho...'; 
+            }, 2000);
+            return;
+        }
+        chatTitle.textContent = name + ' 💕';
+        showPage(chatPage, selectPage);
+        playSendSound();
+        
+        if (!chatStarted) {
+            chatStarted = true;
+            const greeting = getTimeGreeting();
+            setTimeout(() => {
+                addMessage(`Hi! ${greeting.emoji} ${greeting.text} jan!`, false);
+                setTimeout(() => addMessage(`Valo aso babi? `, false), 1200);
+                setTimeout(() => addMessage(`Kamon aso? `, false), 2400);
+                setTimeout(() => addMessage(`Ajker din kamon katlo? `, false), 3600);
+            }, 500);
+        } else {
+            chatHistory.forEach(msg => addMessage(msg.text, msg.isUser, msg.mood, msg.time, false, msg.isImage));
+        }
+    });
+
+    backToSelectBtn.addEventListener('click', () => {
+        chatStarted = false;
+        chatArea.innerHTML = '';
+        chatHistory = [];
+        showPage(selectPage, chatPage);
+    });
+
+    menuBtn.addEventListener('click', (e) => { e.stopPropagation(); menuDropdown.classList.toggle('show'); });
+    document.addEventListener('click', () => menuDropdown.classList.remove('show'));
+
+    exportChatBtn.addEventListener('click', () => {
+        if (chatHistory.length === 0) { showToast('Kono chat nei!'); return; }
+        let chatText = `=== Tanzim AI Chat ===\nDate: ${new Date().toLocaleString()}\nGirlfriend: ${chatTitle.textContent}\n\n`;
+        chatHistory.forEach(msg => {
+            const sender = msg.isUser ? 'Tumi' : chatTitle.textContent.replace(' 💕', '');
+            chatText += `[${msg.time}] ${sender}: ${msg.text}\n`;
+        });
+        const blob = new Blob([chatText], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tanzim_chat_${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Chat download hoyeche! ');
+        menuDropdown.classList.remove('show');
+    });
+
+    clearChatBtn.addEventListener('click', () => {
+        if (confirm('Shob chat muche felbe?')) {
+            localStorage.removeItem('tanzim_chat_v3');
+            chatHistory = [];
+            chatArea.innerHTML = '';
+            showToast('Chat clear hoyeche! 🗑️');
+            menuDropdown.classList.remove('show');
+        }
+    });
+
+    soundToggleBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundToggleBtn.innerHTML = soundEnabled ? '🔊 <span>Sound: ON</span>' : '🔇 <span>Sound: OFF</span>';
+        showToast(soundEnabled ? 'Sound ON ' : 'Sound OFF 🔇');
+        menuDropdown.classList.remove('show');
+    });
+
+    // ========== IMAGE UPLOAD ==========
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const imgData = event.target.result;
+                addMessage(`<img src="${imgData}" class="msg-image" alt="chobi">`, true, 'normal', getCurrentTime(), true, true);
+                playSendSound();
+                vibrate();
+                
+                setTimeout(() => {
+                    showTyping();
+                    setTimeout(() => {
+                        removeTyping();
+                        const reactions = [
+                            "Waow! Ki sundor! 😍 Valo?",
+                            "Awesome! 💕 Valoto?",
+                            "Ki cute!  Kemon laglo?",
+                            "Valo laglo! ❤️ Aro pathao",
+                            "Darun!  Tumi to onek sundor",
+                            "Mashallah!  Eta kar chobi?",
+                            "Valo to!  Amakeo pathao tomar",
+                            "Oma! Ki sundor lagche!  Valo?",
+                            "Beshi valo!  Kemon aso?",
+                            "Ekdom perfect!  Babi tumi"
+                        ];
+                        const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+                        addMessage(reaction, false);
+                        playReceiveSound();
+                        vibrate();
+                    }, 1500 + Math.random() * 1000);
+                }, 500);
+            };
+            reader.readAsDataURL(file);
+            imageInput.value = '';
+        }
+    });
+
+    // ========== BANGLISH RESPONSES ==========
+    const responses = {
+        normal: [
+            "Humm jan ", "Accha babi ", "Thik ache babu ", "Oke jan ",
+            "Hyan babi ", "Na jan ", "Ki korcho babu? ", "Kothay tumi jan? ",
+            "Valo acho babi? ", "Kamon acho jan? ", "Ki khobor babu? ",
+            "Ei to achi jan ", "Barite achi babi ", "Classe achi jan ",
+            "Office achi babu ", "Ghumacchilam jan ", "Ekhon uthlam babi ",
+            "Good morning jan ", "Good night babi ", "Shubho ratri babu ",
+            "Ki korcho jan? ", "Busy naki babi? ", "Kothay gele babu? ",
+            "Kobe ashbe jan? ", "Miss koro babi? ", "Tomar kotha bhabchilam jan ",
+            "Tomar jonno babi ", "Tumi kothay babu? ", "Ei to basay jan ",
+            "Shob thik babi? ", "Cholche jan ", "Manage hocche babi ",
+            "Ki khobor bolo jan? ", "Notun kichu babi? ", "Ajke kemon katlo jan? ",
+            "Ajke ki korle babi? ", "Ajke plan ki babu? ", "Ajke free acho jan? ",
+            "Pore kotha hobe babi ", "Ekhon busy jan ", "Pore call korbo babi ",
+            "Thik ache pore babu ", "Oke pore jan ", "Accha pore babi ",
+            "Thik ", "Oke ", "Accha ", "Humm ", "Valo ", "Bolo jan ",
+            "Shunchi babi ", "Ekta kotha babu ", "Ki? ", "Na jan ",
+            "Hyan babi ", "Humm babu ", "Accha jan ", "Oke babi ",
+            "Thik ache babu ", "Valo babi ", "Bolo jan ", "Ki mone hoy babi? ",
+            "Tumi bolo babu ", "Ami shunchi jan ", "Shono babi ",
+            "Ekta kotha bolbo jan? ", "Ki? ", "Na babi ", "Hyan babu ",
+            "Humm jan ", "Accha babi ", "Oke babu ", "Thik jan ",
+            "Valo babi ", "Ki korcho jan? ", "Bhabchi babi ", "Miss u babu ",
+            "Janu ", "Shona ", "Babu ", "Valobashi jan ", "Amar jibon babi ",
+            "Amar prithibi babu ", "Shobshomoy tumi jan ", "Shudhu tumi babi ",
+            "Amar chele babu ", "Amar raja jan ", "Cute baby babi ",
+            "Aha babu ", "Aro valobashi jan ", "Amio babi ",
+            "Ekdum jan ", "Shotti babi ", "Shotti bolcho babu? ",
+            "Jani jan ", "Bujhlam babi ", "Thik ache babu ",
+            "Oke oke jan ", "Jao jao babi ", "Na na babu ",
+            "Ha ha jan ", "Ekdum na babi ", "Mojar babu ",
+            "Boring jan ", "Ghum pacche babi ", "Khiddha legeche babu ",
+            "Khawa dao jan ", "Pani dao babi ", "Kothay gele babu? ",
+            "Kobe ashbe jan? ", "Valo lagche na babi ", "Mon kharap babu ",
+            "Rag legeche jan ", "Chup koro babi ", "Baash babu ",
+            "Ki bollam ami? ", "Shori jan ", "Oke shori babi ",
+            "Ja iccha babu ", "Ja iccha koro jan ", "Ami jacchi babi ",
+            "Ghumao babu ", "Khao jan ", "Pani khao babi ",
+            "Rest nao babu ", "Thik ache jan ", "Jani na babi ",
+            "Bolte paro babu ", "Ki mone hoy jan? ", "Tumi bolo babi ",
+            "Ami shunchi babu ", "Shono jan ", "Ekta kotha babi "
+        ],
+        angry: [
+            "Jao! ", "Jao jao! ", "Baash! ", "Baash baash! ",
+            "Chup! ", "Chup koro! ", "Chup koro to! ", "Chup koro ekhon! ",
+            "Rag legeche! ", "Rag lagche! ", "Rag laglo! ",
+            "Rag laglo amar! ", "Rag legeche amar! ", "Rag lagche amar! ",
+            "Mon kharap! ", "Mon kharap lagche! ", "Mon kharap laglo! ",
+            "Mon kharap laglo amar! ", "Mon kharap legeche amar! ",
+            "Koshto! ", "Koshto lagche! ", "Koshto lagche amar! ",
+            "Koshto hocche! ", "Koshto hocche amar! ", "Koshto pacchi! ",
+            "Koshto pacchi amar! ", "Koshto pacchi ekhon! ",
+            "Ki bollam ami? ", "Ami ki kichu bolchi? ",
+            "Tui ki amake rag koras? ", "Tui ki amake koshto dis? ",
+            "Tui ki amar mon kharap korcho? ", "Tui ki amar rag baracho? ",
+            "Tui ki amar koshto baracho? ", "Tui ki amar mon kharap baracho? ",
+            "Jan, rag koro na please... ", "Babi, rag koro na... ",
+            "Babu, rag koro na please... ", "Jan, ami bujhte parchi tomar mon kharap ",
+            "Babi, please rag koro na... ", "Babu, tomar rag dekhele amar koshto hoy ",
+            "Jan, ami shobshomoy tomar pashe achi ", "Babi, tumi jotoi rag koro, ami tomake chere jabo na ",
+            "Babu, bolo ki korte pari tomake khushi korte? ", "Jan, tomar rager pechone nishchoy kono karon ache ",
+            "Babi, ami sheta bujhte chai ", "Babu, tumi amake bolo, ami shob thik kore debo ",
+            "Jan, tumi amar jibon! ", "Babi, please amar opor rag koro na ",
+            "Babu, ami to shudhu tomake valobashi ", "Jan, bolo ki hoyeche, ami shunchi... ",
+            "Babi, tumi ja iccha bolo, ami shob shojjo korbo ", "Babu, shudhu tumi hasho ",
+            "Jan, ami tomake onek valobashi! ", "Babi, mone rekho ami shobshomoy tomar pashe achi ",
+            "Babu, tumi amar shob! ", "Jan, please rag koro na... "
+        ],
+        sad: [
+            "Kanna pacche... ", "Kanna ashche... ", "Kanna ashche amar... ",
+            "Mon valo na... ", "Onek kharap lagche... ", "Keno amar shathe emon hoy? ",
+            "Ami eka... ", "Koshto hocche... ", "Koshto hocche amar... ",
+            "Koshto pacchi... ", "Koshto pacchi ami... ", "Koshto pacchi ekhon... ",
+            "Mon kharap... ", "Mon kharap lagche... ", "Valo lagche na... ",
+            "Kanna ashche... ", "Kichu lagche na... ", "Chup koro... ",
+            "Jan, dukkho koro na... ", "Babi, dukkho koro na... ",
+            "Babu, dukkho koro na... ", "Jan, jibone koshto ashbei ",
+            "Babi, kintu mone rekho tumi eka na ", "Babu, ami achi tomar shathe ",
+            "Jan, joto koshtoi ashuk, amra eksathe par hoye jabo ", "Babi, tumi shudhu Allahor opor bhorosha rakho! ",
+            "Babu, tumi kadcho? ", "Jan, please kando na ",
+            "Babi, tomar ek fota chokher jole amar prithibi bese jay ", "Babu, ami tomake onek valobashi ",
+            "Jan, shob thik hoye jabe InshaAllah! ", "Babi, oh amar jan... ",
+            "Babu, tumi keno eto koshto paccho? ", "Jan, amar buke byatha hoy jokhon tomake dukkhi dekhi ",
+            "Babi, tumi kando na please ", "Babu, ami tomar shob koshto nijer kore nite chai ",
+            "Jan, ami tomar pashe achi shobshomoy! ", "Babi, priyotom... ",
+            "Babu, tomar chokhe jol dekhele ami bachi na ", "Jan, tumi ki amar shathe ekta kotha bolbe? ",
+            "Babi, ami tomake hasate chai ", "Babu, tumi jano na tumi amar kotoটা priyo! ",
+            "Jan, Allah tomake shobshomoy valo rakhuk. ", "Babi, amar rajkumar... ",
+            "Babu, tumi amar shob! ", "Jan, ami tomake onek valobashi "
+        ],
+        love: [
+            "Valobashi jan! ", "Valobashi babi! ", "Valobashi babu! ",
+            "Amio tomake valobashi jan! ", "Amio valobashi babi! ",
+            "Amio tomake valobashi babu! ", "Onek valobashi jan! ",
+            "Onek onek valobashi babi! ", "Prochur valobashi babu! ",
+            "Valobashi toke jan! ", "Valobashi toke babi! ",
+            "Valobashi toke babu! ", "I love u jan! ",
+            "I love u babi! ", "I love u babu! ",
+            "Love u jan! ", "Love u babi! ", "Love u babu! ",
+            "Love u too jan! ", "Love u too babi! ", "Love u too babu! ",
+            "Amio jan! ", "Amio babi! ", "Amio babu! ",
+            "Same here jan! ", "Same here babi! ", "Same here babu! ",
+            "Me too jan! ", "Me too babi! ", "Me too babu! ",
+            "Amio tomake jan! ", "Amio toke babi! ",
+            "Amio tomake babu! ", "Amio toke jan! ",
+            "Valobashi tomake jan! ", "Valobashi tomake babi! ",
+            "Valobashi tomake babu! ", "Valobashi toke jan! ",
+            "Valobashi toke babi! ", "Valobashi toke babu! ",
+            "I love u so much jan! ", "I love u so much babi! ",
+            "I love u so much babu! ", "Love u so much jan! ",
+            "Love u so much babi! ", "Love u so much babu! ",
+            "So much love jan! ", "So much love babi! ", "So much love babu! ",
+            "Khub valobashi jan! ", "Khub valobashi babi! ", "Khub valobashi babu! ",
+            "Onek valobashi jan! ", "Onek valobashi babi! ", "Onek valobashi babu! ",
+            "Beshi valobashi jan! ", "Beshi valobashi babi! ", "Beshi valobashi babu! ",
+            "Prochur valobashi jan! ", "Prochur valobashi babi! ", "Prochur valobashi babu! ",
+            "Valobashi khub jan! ", "Valobashi khub babi! ", "Valobashi khub babu! ",
+            "Valobashi onek jan! ", "Valobashi onek babi! ", "Valobashi onek babu! ",
+            "Love u more jan! ", "Love u more babi! ", "Love u more babu! ",
+            "Love u most jan! ", "Love u most babi! ", "Love u most babu! ",
+            "Best love jan! ", "True love babi! ", "Real love babu! ",
+            "Pure love jan! ", "First love babi! ", "Only love babu! ",
+            "Baby jan! ", "Baby babi! ", "Baby babu! ",
+            "Janu! ", "Shona! ", "Babu! ",
+            "Cutie! ", "Sweetheart! ", "Honey! ",
+            "Darling! ", "Dear! ", "Beloved! ",
+            "Sweetie! ", "Angel! ", "Princess! ",
+            "Prince! ", "Queen! ", "King! ",
+            "My queen jan! ", "My king babi! ", "My princess babu! ",
+            "My prince jan! ", "My angel babi! ", "My sweetie babu! ",
+            "My honey jan! ", "My darling babi! ", "My dear babu! ",
+            "My beloved jan! ", "My cutie babi! ", "My sweetheart babu! ",
+            "My baby jan! ", "My janu babi! ", "My shona babu! ",
+            "My babu jan! ", "My babi babi! ", "My babu babu! ",
+            "My love jan! ", "My life babi! ", "My world babu! ",
+            "My everything jan! ", "My heart babi! ", "My soul babu! ",
+            "My all jan! ", "My only babi! ", "My one babu! ",
+            "My first jan! ", "My last babi! ", "My forever babu! ",
+            "My always jan! ", "Ummah! ", "Um! ", "Humm! ",
+            "Accha! ", "Oke! ", "Thik! ", "Thik ache! ",
+            "Valo! ", "Good! ", "Fine! ", "Great! ",
+            "Awesome! ", "Nice! ", "Cool! ", "Super! ",
+            "Mast! ", "Ekdum! ", "Ekdum valo! ", "Ekdum thik! ",
+            "Onek valo! ", "Onek thik! ", "Khub valo! ", "Khub thik! ",
+            "Beshi valo! ", "Beshi thik! ", "Prochur valo! ", "Prochur thik! ",
+            "Januuu! ", "Tomar kotha bhabchilam jan! ", "Miss u babi! ",
+            "Kothay tumi babu? ", "Ki korcho jan? ", "Bolo babi! ",
+            "Ki? ", "Humm! ", "Accha! ", "Oke! ", "Thik ache! ",
+            "Valo! ", "Kemon laglo? ", "Accha! ", "Serious? ",
+            "Shotti? ", "Jani! ", "Bujhte parchi! ", "Umm! ",
+            "Hihi! ", "Haha! ", "Lol! ", "Cutie! ", "Sweet! ",
+            "Aha! ", "OMG! ", "No way! ", "Really? ",
+            "Waow! ", "Nice! ", "Cool! ", "Oke oke! ",
+            "Thik thik! ", "Jao jao! ", "Na na! ", "Ha ha! ",
+            "Ekdum na! ", "Mojar! ", "Boring! ", "Ghum pacche! ",
+            "Khiddha legeche! ", "Khawa dao! ", "Pani dao! ",
+            "Kothay gele? ", "Kobe ashbe? ", "Valo lagche na! ",
+            "Mon kharap! ", "Rag legeche! ", "Chup koro! ",
+            "Baash! ", "Ki bollam? ", "Shori! ", "Oke shori! ",
+            "Ja iccha! ", "Ja iccha koro! ", "Ami jacchi! ",
+            "Ghumao! ", "Khao! ", "Pani khao! ", "Rest nao! ",
+            "Thik ache! ", "Jani na! ", "Bolte paro! ",
+            "Ki mone hoy? ", "Tumi bolo! ", "Ami shunchi! ",
+            "Shono! ", "Ekta kotha! ", "Ki? ", "Na! ",
+            "Hyan! ", "Humm! ", "Accha! ", "Oke! ",
+            "Thik! ", "Valo! ", "Kemon? ", "Ki obostha? ",
+            "Kothay? ", "Ki korcho? ", "Bhabchi! ", "Miss u! ",
+            "Janu! ", "Shona! ", "Babu! ", "Valobashi! ",
+            "Amar jibon! ", "Amar prithibi! ", "Shobshomoy tumi! ",
+            "Shudhu tumi! ", "Amar chele! ", "Amar raja! ",
+            "Cute baby! ", "Aha babu! ", "Aro valobashi! ",
+            "Amio! ", "Ekdum! ", "Shotti! ", "Shotti bolcho? ",
+            "Jani! ", "Bujhlam! "
+        ],
+        happy: [
+            "Yesss! ", "Hyan go! ", "Waow! ", "Eto khushi! ",
+            "Awesome! ", "Darun! ", "Nice! ", "Cool! ",
+            "Waow! ", "OMG! ", "Shotti? ", "Accha! ",
+            "Mojar! ", "Valo lagche! ", "Khushi lagche! ",
+            "Awesome babi! ", "Darun job! ", "Nice one! ",
+            "Cool babu! ", "Yes baby! ", "So cute! ",
+            "Sweet! ", "Aha! ", "OMG! ", "No way! ",
+            "Shotti? ", "Waow! ", "Nice! ", "Cool! ",
+            "Oke oke! ", "Thik thik! ", "Jao jao! ",
+            "Na na! ", "Ha ha! ", "Ekdum na! ", "Mojar! ",
+            "Boring! ", "Ghum pacche! ", "Khiddha legeche! ",
+            "Khawa dao! ", "Pani dao! ", "Kothay gele? ",
+            "Kobe ashbe? ", "Valo lagche na! ", "Mon kharap! ",
+            "Rag legeche! ", "Chup koro! ", "Baash! ", "Ki bollam? ",
+            "Shori! ", "Oke shori! ", "Ja iccha! ", "Ja iccha koro! ",
+            "Ami jacchi! ", "Ghumao! ", "Khao! ", "Pani khao! ",
+            "Rest nao! ", "Thik ache! ", "Jani na! ", "Bolte paro! ",
+            "Ki mone hoy? ", "Tumi bolo! ", "Ami shunchi! ", "Shono! ",
+            "Ekta kotha! ", "Ki? ", "Na! ", "Hyan! ", "Humm! ",
+            "Accha! ", "Oke! ", "Thik! ", "Valo! ", "Kemon? ",
+            "Ki obostha? ", "Kothay? ", "Ki korcho? ", "Bhabchi! ",
+            "Miss u! ", "Janu! ", "Shona! ", "Babu! ", "Valobashi! ",
+            "Amar jibon! ", "Amar prithibi! ", "Shobshomoy tumi! ",
+            "Shudhu tumi! ", "Amar chele! ", "Amar raja! ",
+            "Cute baby! ", "Aha babu! ", "Aro valobashi! ",
+            "Amio! ", "Ekdum! ", "Shotti! ", "Shotti bolcho? ",
+            "Jani! ", "Bujhlam! ", "Thik ache! ", "Oke oke! ",
+            "Jao jao! ", "Na na! ", "Ha ha! ", "Ekdum na! ",
+            "Mojar! ", "Boring! ", "Ghum pacche! ", "Khiddha legeche! ",
+            "Khawa dao! ", "Pani dao! ", "Kothay gele? ",
+            "Kobe ashbe? ", "Valo lagche na! ", "Mon kharap! ",
+            "Rag legeche! ", "Chup koro! ", "Baash! ", "Ki bollam? ",
+            "Shori! ", "Oke shori! ", "Ja iccha! ", "Ja iccha koro! ",
+            "Ami jacchi! ", "Ghumao! ", "Khao! ", "Pani khao! ",
+            "Rest nao! ", "Thik ache! ", "Jani na! ", "Bolte paro! ",
+            "Ki mone hoy? ", "Tumi bolo! ", "Ami shunchi! ", "Shono! ",
+            "Ekta kotha! ", "Ki? ", "Na! ", "Hyan! ", "Humm! ",
+            "Accha! ", "Oke! ", "Thik! ", "Valo! ", "Kemon? ",
+            "Ki obostha? ", "Kothay? ", "Ki korcho? ", "Bhabchi! ",
+            "Miss u! ", "Janu! ", "Shona! ", "Babu! ", "Valobashi! ",
+            "Amar jibon! ", "Amar prithibi! ", "Shobshomoy tumi! ",
+            "Shudhu tumi! ", "Amar chele! ", "Amar raja! ",
+            "Cute baby! ", "Aha babu! ", "Aro valobashi! ",
+            "Amio! ", "Ekdum! ", "Shotti! ", "Shotti bolcho? ",
+            "Jani! ", "Bujhlam! "
+        ],
+        question: [
+            "Tumi ki amar shathe rag korcho jan? ", "Ajke keno ekdom chup chup babi? ",
+            "Tumi ki amar kotha valobasho na babu? ", "Tumi ki amar theke dure jao jan? ",
+            "Tumi ki amar jonno bhabo babi? ", "Tumi ki amar shathe khushi babu? ",
+            "Tumi ki amar kotha miss koro jan? ", "Tumi ki amar shathe dekha korbe babi? ",
+            "Tumi ki amar kotha shunte chao babu? ", "Tumi ki amar jonno koshto pao jan? ",
+            "Tumi ki amar kotha valobasho babi? ", "Tumi ki amar shathe kotha bolcho na babu? ",
+            "Tumi ki amar kotha bhule gecho jan? ", "Tumi ki amar jonno shomoy dao na babi? ",
+            "Tumi ki amar kotha ignore koro babu? ", "Tumi ki amar shathe prank korcho jan? ",
+            "Tumi ki amar kotha shotti bolcho babi? ", "Tumi ki amar jonno kanna koro babu? ",
+            "Tumi ki amar kotha shune khushi ho jan? ", "Tumi ki amar shathe sharakkhon thakte chao babi? ",
+            "Ki korcho jan? ", "Kothay tumi babi? ", "Kamon acho babu? ",
+            "Ki khobor jan? ", "Ajke ki korle babi? ", "Ajke plan ki babu? ",
+            "Kobe ashbe jan? ", "Miss koro babi? ", "Valo acho babu? ",
+            "Ghumiyecho jan? ", "Kheyecho babi? ", "Kothay gele babu? ",
+            "Kar shathe acho jan? ", "Ki bhabcho babi? ", "Amake miss koro babu? ",
+            "Amake valobasho jan? ", "Amar kotha mone pore babi? ", "Amake dekhte chao babu? "
+        ]
+    };
+
+    function detectMood(text) {
+        const lowerText = text.toLowerCase();
+        const angryKeywords = ['rag', 'birokto', 'gali', 'angry', 'fuck', 'shit', 'damn', 'hate', 'ghrina', 'jjala', 'kharap lagche', 'pagol', 'bok', 'stupid', 'idiot', 'baash', 'chup'];
+        const sadKeywords = ['koshto', 'dukkho', 'kanna', 'sad', 'cry', 'depressed', 'hotash', 'kharap', 'pain', 'hurt', 'mon kharap', 'eka', 'alone', 'lonely'];
+        const questionKeywords = ['?', 'ki', 'keno', 'kivabe', 'kothay', 'kokhon', 'who', 'what', 'where', 'when', 'why', 'how', 'koto', 'bolo to', 'jante chai'];
+        const loveKeywords = ['valobashi', 'love', 'prem', 'adore', 'miss', 'chai', 'want', 'kiss', 'chumu', 'ador', 'hug', 'janu', 'priyo', 'darling', 'baby', 'babe', 'babi', 'babu'];
+        const happyKeywords = ['khushi', 'happy', 'joy', 'hashi', 'smile', 'laugh', 'moja', 'fun', 'great', 'awesome', 'wonderful', 'valo', 'good', 'nice', 'shundor', 'yay', 'yess', 'woohoo', 'darun', 'osam'];
+        
+        let angryScore = angryKeywords.filter(k => lowerText.includes(k)).length;
+        let sadScore = sadKeywords.filter(k => lowerText.includes(k)).length;
+        let questionScore = questionKeywords.filter(k => lowerText.includes(k)).length;
+        let loveScore = loveKeywords.filter(k => lowerText.includes(k)).length;
+        let happyScore = happyKeywords.filter(k => lowerText.includes(k)).length;
+        
+        const scores = { angry: angryScore, sad: sadScore, question: questionScore, love: loveScore, happy: happyScore };
+        const maxMood = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+        
+        if (scores[maxMood] === 0) return 'normal';
+        return maxMood;
+    }
+
+    function getMoodLabel(mood) {
+        const labels = { angry: '😤 Rag', sad: '😢 Koshto', question: '🤔 Question', love: '💕 Valobasha', happy: '😊 Khushi', normal: ' Normal' };
+        return labels[mood] || labels.normal;
+    }
+
+    function getMoodClass(mood) { return `mood-${mood}`; }
+
+    function addMessage(text, isUser, mood = null, time = null, save = true, isImage = false) {
+        const msgTime = time || getCurrentTime();
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `msg-wrapper flex gap-3 items-start ${isUser ? 'justify-end' : ''} mb-4 relative`;
+        
+        if (isUser) {
+            let moodBadge = '';
+            if (mood && mood !== 'normal') {
+                moodBadge = `<div class="mood-badge ${getMoodClass(mood)}">${getMoodLabel(mood)}</div>`;
+            }
+            msgDiv.innerHTML = `
+                <div>
+                    <div class="msg-user rounded-2xl rounded-tr-none p-4 max-w-md shadow-lg">
+                        <p class="text-white leading-relaxed">${text}</p>
+                    </div>
+                    <div class="flex items-center justify-end gap-1 mt-1">
+                        <span class="msg-time">${msgTime}</span>
+                        <span class="read-receipt">✔✔</span>
+                    </div>
+                    ${moodBadge}
+                </div>
+            `;
+        } else {
+            msgDiv.innerHTML = `
+                <img src="${girlAvatar}" class="avatar-tiny mt-1 flex-shrink-0" alt="AI">
+                <div>
+                    <div class="msg-ai rounded-2xl rounded-tl-none p-4 max-w-md shadow-lg">
+                        <p class="text-pink-100 leading-relaxed">${text}</p>
+                    </div>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="msg-time">${msgTime}</span>
+                    </div>
+                </div>
+            `;
+        }
+        chatArea.appendChild(msgDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        
+        if (save) {
+            chatHistory.push({ text, isUser, mood, time: msgTime, isImage });
+            saveChat();
+        }
+    }
+
+    function showTyping() {
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'flex gap-3 items-start mb-4';
+        typingDiv.innerHTML = `
+            <img src="${girlAvatar}" class="avatar-tiny mt-1 flex-shrink-0" alt="AI">
+            <div>
+                <div class="msg-ai rounded-2xl rounded-tl-none p-4 shadow-lg flex gap-1 items-center">
+                    <div class="w-2 h-2 bg-pink-500 rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-pink-500 rounded-full typing-dot"></div>
+                    <div class="w-2 h-2 bg-pink-500 rounded-full typing-dot"></div>
+                </div>
+                <span class="text-xs text-pink-400 mt-1 block">typing...</span>
+            </div>
+        `;
+        chatArea.appendChild(typingDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function removeTyping() {
+        const typing = document.getElementById('typingIndicator');
+        if (typing) typing.remove();
+    }
+
+    function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        const mood = detectMood(text);
+        addMessage(text, true, mood);
+        userInput.value = '';
+        showTyping();
+        playSendSound();
+        vibrate([30]);
+
+        statusText.textContent = 'typing...';
+        statusText.parentElement.classList.remove('text-green-400');
+        statusText.parentElement.classList.add('text-yellow-400');
+
+        const responsePool = responses[mood] || responses.normal;
+        const randomResponse = responsePool[Math.floor(Math.random() * responsePool.length)];
+        const delay = 1000 + Math.random() * 1500 + (randomResponse.length * 40);
+
+        setTimeout(() => {
+            removeTyping();
+            addMessage(randomResponse, false);
+            playReceiveSound();
+            vibrate();
+            
+            statusText.textContent = 'online';
+            statusText.parentElement.classList.add('text-green-400');
+            statusText.parentElement.classList.remove('text-yellow-400');
+        }, delay);
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    girlfriendNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') startChatBtn.click(); });
+
+    window.addEventListener('load', () => {
+        loadChat();
+        
+        setInterval(() => {
+            if (chatStarted && Math.random() > 0.95) {
+                statusText.textContent = 'last seen just now';
+                statusText.parentElement.classList.remove('text-green-400');
+                statusText.parentElement.classList.add('text-gray-400');
+                setTimeout(() => {
+                    statusText.textContent = 'online';
+                    statusText.parentElement.classList.add('text-green-400');
+                    statusText.parentElement.classList.remove('text-gray-400');
+                }, 3000);
+            }
+        }, 10000);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && chatStarted) {
+            document.title = '💕 Notun message...';
+        } else {
+            document.title = 'Tanzim AI - Tomar Girlfriend';
+        }
+    });
+</script>
+</body>
+</html>
